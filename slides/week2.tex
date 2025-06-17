@@ -263,9 +263,9 @@ We can \textbf{construct}, \textbf{compose}, and \textbf{query} Datalog programs
 \textbf{Injection} --- Getting facts into Datalog
 \begin{itemize}
     \small
-    \item The \Code{inject e1, ..., en into A1, ... An} expression returns a
+    \item The \Code{inject e1, ..., en into A1/X1, ... An/Xn} expression returns a
     Datalog program where each tuple in the collection $e_i$ is associated with
-    predicate symbol $A_i$.
+    predicate symbol $A_i$ of arity $X_i$.
 \end{itemize}
 
 \pause
@@ -455,7 +455,7 @@ let edges = (1, 2) :: (2, 3) :: (3, 3) :: Nil
 into a Datalog relation, i.e. a set of facts, using \Code{inject}:
 
 \begin{lstlisting}[language=flix, xleftmargin=0.8cm]
-inject edges into Edge
+inject edges into Edge/2
 \end{lstlisting}
 
 which evaluates to the Datalog program value:
@@ -474,7 +474,7 @@ For example,
 \begin{lstlisting}[language=flix, xleftmargin=0.8cm]
 let nodes = Set#{1, 2, 3, 4};
 let edges = (1, 2) :: (2, 3) :: (3, 3) :: Nil
-inject nodes, edges into Node, Edge
+inject nodes, edges into Node/1, Edge/2
 \end{lstlisting}
 
 evaluates to the Datalog program value:
@@ -489,7 +489,7 @@ evaluates to the Datalog program value:
 The general form of \Code{inject} is:
 
 \begin{lstlisting}[language=flix, xleftmargin=0.8cm]
-inject exp_1, exp_2, ... exp_n into sym_1, sym_2, ..., sym_n
+inject exp_1, exp_2, ... exp_n into sym_1/num_1, sym_2/num_2, ..., sym_n/num_n
 \end{lstlisting}
 
 The \Code{inject} construct works for any collection that implements
@@ -1055,7 +1055,7 @@ We know how to compute reachability in a graph:
 
 \begin{lstlisting}[language=flix, xleftmargin=0.8cm]
 def reach(origin: t, edges: List[(t, t)]): Vector[t] with Order[t] = 
-    let db = inject edges into Edge;
+    let db = inject edges into Edge/2;
     let pr = #{
         Reach(origin).
         Reach(y) :- Reach(x), Edge(x, y).
@@ -1074,7 +1074,7 @@ We can use \emph{lattice semantics} to solve this problem:
 
 \begin{lstlisting}[language=flix, xleftmargin=0.8cm]
 def sssd(origin: t, edges: List[(t, Int32, t)]): ... = 
-    let db = inject edges into Edge;
+    let db = inject edges into Edge/3;
     let pr = #{
         Dist(origin; Down(0)).
         Dist(y; d1 + Down(d2)) :- Dist(x; d1), Edge(x, d2, y).
